@@ -60,6 +60,24 @@ body {
     font-weight: 600;
 }
 
+.status-btn {
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.status-btn:hover {
+    background: rgba(45, 80, 22, 0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(45, 80, 22, 0.2);
+}
+
+.status-btn:active {
+    transform: translateY(0);
+}
+
 /* Layout */
 .main-container {
     display: flex;
