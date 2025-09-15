@@ -1,7 +1,11 @@
 /**
  * FRA Atlas DSS - Main Application Module
- * Coordinates all components and manages application state
- */
+ * Coordinates all components and manages application st        const dataSources = [
+            'assets/data/odisha-claims.geojson',    // Odisha - Real claims data
+            'assets/data/mp-claims.geojson',        // Madhya Pradesh
+            'assets/data/tripura-claims.geojson',   // Tripura
+            'assets/data/telangana-claims.geojson'  // Telangana
+        ];*/
 
 class FRAAtlasApp {
     constructor() {

@@ -5,12 +5,39 @@
 class Dashboard {
     constructor() {
         this.elements = this.findDashboardElements();
+        this.statsCalculator = new window.DataStatsCalculator();
         this.defaultCounts = {
             approved: 234,
             pending: 156,
             review: 43,
             rejected: 12
         };
+        
+        // Initialize with real stats
+        this.initializeRealStats();
+    }
+
+    /**
+     * Initialize with real statistics from data files
+     */
+    async initializeRealStats() {
+        try {
+            const realStats = await this.statsCalculator.calculateRealStats();
+            this.updateStatistics({
+                approved: realStats.approved,
+                pending: realStats.pending,
+                review: realStats.review,
+                rejected: realStats.rejected
+            });
+            
+            // Update community impact metrics
+            this.updateCommunityMetrics(realStats.families_protected, realStats.hectares_secured);
+            
+            console.log('Real statistics loaded:', realStats);
+        } catch (error) {
+            console.warn('Using default statistics due to error:', error);
+            this.updateStatistics(this.defaultCounts);
+        }
     }
 
     /**
@@ -143,6 +170,23 @@ class Dashboard {
                     alertDiv.parentNode.removeChild(alertDiv);
                 }
             }, 5000);
+        }
+    }
+
+    /**
+     * Update community impact metrics
+     */
+    updateCommunityMetrics(familiesProtected, hectaresSecured) {
+        // Update families protected count
+        const familiesElement = document.querySelector('.stat-card .stat-number');
+        if (familiesElement && familiesElement.textContent.includes('8,542')) {
+            this.animateCount(familiesElement, familiesProtected, 1000);
+        }
+        
+        // Update hectares secured count  
+        const hectaresElement = document.querySelector('.stat-card:last-child .stat-number');
+        if (hectaresElement && hectaresElement.textContent.includes('24,156')) {
+            this.animateCount(hectaresElement, Math.round(hectaresSecured), 1000);
         }
     }
 
