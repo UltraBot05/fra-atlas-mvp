@@ -1,4 +1,4 @@
-# � FRA Atlas MVP - Decision Support System
+# 🌳 FRA Atlas MVP - Decision Support System
 
 ## SIH 2025 Problem Statement: SIH12508
 **Smart India Hackathon 2025 | Forest Rights Act Atlas for Community Empowerment**
