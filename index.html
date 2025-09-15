@@ -388,11 +388,15 @@
 			position: 'topright'
 		}).addTo(map);
 
-		// Add base layer
-		var baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		// Base layers
+		var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 			attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
 			maxZoom: 18,
 		}).addTo(map);
+		var positron = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+			attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>, &copy; OpenStreetMap contributors',
+			maxZoom: 19
+		});
 
 		// Sample FRA claim boundary (polygon around a forest area in Odisha)
 		var claimBoundary = {
@@ -418,7 +422,7 @@
 			}
 		};
 
-		// Add FRA claim boundary to map
+		// Add FRA claim boundary to map (fallback sample)
 		var claimLayer = L.geoJSON(claimBoundary, {
 			style: {
 				color: "#ff7800",
@@ -445,7 +449,10 @@
 					className: 'popup-custom'
 				});
 			}
-		}).addTo(map);
+		});
+
+		// Group for claims to allow replacement when external data loads
+		var claimsGroup = L.layerGroup([claimLayer]).addTo(map);
 
 		// Define image bounds for the overlays (matching the claim area)
 		var imageBounds = [[20.2900, 85.8100], [20.3100, 85.8300]];
@@ -498,6 +505,11 @@
 			opacity: 0.6,
 			interactive: false
 		});
+
+		// Layer Controls (base + overlays)
+		var baseMaps = { "OpenStreetMap": osm, "Positron (Light)": positron };
+		var overlayMaps = { "FRA Claims": claimsGroup };
+		var layerControl = L.control.layers(baseMaps, overlayMaps, { position: 'topright', collapsed: true }).addTo(map);
 
 		// Button event handlers
 		document.getElementById('beforeBtn').addEventListener('click', function() {
@@ -554,10 +566,58 @@
 			position: 'bottomright'
 		}).addTo(map);
 
-		// Initial popup to guide users
+		// Try to load external GeoJSON dataset when served via http(s)
+		(async function loadDemoDataset() {
+			try {
+				const resp = await fetch('assets/data/sample-claims.geojson', { cache: 'no-store' });
+				if (!resp.ok) throw new Error('HTTP ' + resp.status);
+				const data = await resp.json();
+				// Replace current claims group with loaded features
+				claimsGroup.clearLayers();
+				const loaded = L.geoJSON(data, {
+					style: function (feature) {
+						const status = (feature.properties.status || '').toLowerCase();
+						const color = status.includes('pending') ? '#f1c40f' : status.includes('reject') ? '#c0392b' : status.includes('review') ? '#8e44ad' : '#ff7800';
+						return { color, weight: 2.5, fillColor: color, fillOpacity: 0.2 };
+					},
+					onEachFeature: function(f, layer){
+						const status = f.properties.status || 'Unknown';
+						const name = f.properties.claim_id || f.properties.name || 'Claim';
+						const area = (f.properties.area_hectares ? f.properties.area_hectares + ' ha' : (f.properties.area || '—'));
+						const village = f.properties.village_name || f.properties.village || '—';
+						const district = f.properties.district || '—';
+						const alert = f.properties.deforestation_detected ? '<span style="color:#d32f2f;font-weight:600">Alert: Deforestation</span>' : 'No Active Alert';
+						layer.bindPopup(`
+							<div style="min-width:220px">
+								<h4 style="margin:0 0 8px;color:#2d5016">${name}</h4>
+								<p><strong>Village:</strong> ${village}</p>
+								<p><strong>District:</strong> ${district}</p>
+								<p><strong>Status:</strong> ${status}</p>
+								<p><strong>Area:</strong> ${area}</p>
+								<p>${alert}</p>
+							</div>
+						`);
+					}
+				});
+				claimsGroup.addLayer(loaded);
+				try { map.fitBounds(loaded.getBounds(), { padding: [20,20] }); } catch (e) {}
+				console.log('Loaded external sample-claims.geojson');
+			} catch (err) {
+				// Fallback to built-in sample when opened as file:// or network blocked
+				console.warn('Could not load external GeoJSON, using built-in sample. Tip: run a local server for full demo.');
+				claimsGroup.addLayer(claimLayer).addTo(map);
+				try { map.fitBounds(claimLayer.getBounds(), { padding: [20,20] }); } catch (e) {}
+			}
+		})();
+
+		// Initial guidance popup (after claims layer is ready). Delay slightly for dataset load
 		setTimeout(function() {
-			claimLayer.getLayers()[0].openPopup();
-		}, 2000);
+			try {
+				var any = claimsGroup.getLayers()[0];
+				var inner = any && any.getLayers ? any.getLayers()[0] : any;
+				if (inner && inner.openPopup) inner.openPopup();
+			} catch (e) {}
+		}, 2500);
 
 		console.log("🌳 FRA Atlas DSS MVP loaded successfully!");
 		console.log("📊 Monitoring 1,458 FRA claims across 4 states");
