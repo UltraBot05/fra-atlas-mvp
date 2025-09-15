@@ -1,13 +1,18 @@
-# 🌳 FRA Atlas DSS - Decision Support System
+# � FRA Atlas MVP - Decision Support System
 
-**Smart India Hackathon 2025 - Problem Statement ID: SIH12508**
+## SIH 2025 Problem Statement: SIH12508
+**Smart India Hackathon 2025 | Forest Rights Act Atlas for Community Empowerment**
 
-## 🎯 Problem Statement
-Development of AI-powered FRA Atlas and WebGIS-based Decision Support System (DSS) for Integrated Monitoring of Forest Rights Act (FRA) Implementation
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://ultrabot05.github.io/fra-atlas-mvp/)
+[![SIH 2025](https://img.shields.io/badge/SIH-2025-blue)](https://www.sih.gov.in/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## 👥 Team Details
-- **Team Name**: Green Guardians
-- **Theme**: Miscellaneous
+## 🎯 Project Overview
+
+The **FRA Atlas MVP** is a comprehensive Decision Support System designed to address critical challenges in **Forest Rights Act (FRA) implementation** and **community forest monitoring**. This system empowers local communities, government officials, and researchers with real-time satellite-based forest monitoring, claim management, and environmental reporting capabilities.
+
+### 🚀 **Live Application**
+**Visit**: [https://ultrabot05.github.io/fra-atlas-mvp/](https://ultrabot05.github.io/fra-atlas-mvp/)
 - **Category**: Software
 - **Problem Statement**: SIH12508
 
